@@ -27,7 +27,7 @@ DN SAFEZONE IS A SAFEZONE SCRIPT !! WHICH ALLOW YOUR SERVER ON SAFE ENVIRONMENT 
 
 DN NOTIFY - https://dn-script.tebex.io/package/5864995
 
-polyzone 
+POLYZONE
 
 ```
 # Installation
