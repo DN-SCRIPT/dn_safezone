@@ -26,12 +26,11 @@ DN SAFEZONE IS A SAFEZONE SCRIPT !! WHICH ALLOW YOUR SERVER ON SAFE ENVIRONMENT 
 -------------------
 
 DN NOTIFY - https://dn-script.tebex.io/package/5864995
+
 polyzone 
 
 ```
 # Installation
-
-  
 
 Add this in your `server.cfg`:
 
@@ -47,6 +46,7 @@ IMAGE - https://cdn.discordapp.com/attachments/1141381331750752347/1195039342184
 ---------------------
 
 DN DEVELOPMENT DISCORD - https://discord.gg/rBFG6y79Wg
+
 DN TEBEX - https://dn-script.tebex.io/
 
 # 📺 SHOWCASE
