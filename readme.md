@@ -35,7 +35,7 @@ polyzone
 Add this in your `server.cfg`:
 
 ```
-ensure dn_notify
+ensure dn_safezone
 ```
 start your server
 ```
