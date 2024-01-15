@@ -1,9 +1,14 @@
 local job = ""
 local grade = 0
+local ESX = nil
+local AllCreatedZones = {}
+local IsLoopStarted = false
+local IsPlayerCanAttackInSafeZone = nil
+local UnarmedHash = `WEAPON_UNARMED`
+local WhatIsLastLoop = ""
 
 if UseESX then
 	Citizen.CreateThread(function()
-		local ESX = nil -- dont need make this global it just for get job one time
 		while ESX == nil do
 			ESX = exports["es_extended"]:getSharedObject()
 			Citizen.Wait(10)
@@ -18,50 +23,42 @@ if UseESX then
 	end)
 
 	RegisterNetEvent("esx:setJob")
-	AddEventHandler("esx:setJob",function(NewJob)
+	AddEventHandler("esx:setJob", function(NewJob)
 		job = NewJob.name
 		grade = NewJob.grade
 	end)
 end
 
-local AllCreatedZones = {}
-
 Citizen.CreateThread(function()
-	for k,v in pairs(AllZones) do
-		local TempZone = nil
+	for k, v in pairs(AllZones) do
 		local TempTable = {}
-		for k2,v2 in ipairs(v.Zones) do
-			TempZone = PolyZone:Create(v2.Coords, {
+		for k2, v2 in ipairs(v.Zones) do
+			local TempZone = PolyZone:Create(v2.Coords, {
 				name = k .. "_" .. k2,
 				minZ = v2.minZ,
 				maxZ = v2.maxZ,
 				debugPoly = v.Debug,
 				debugGrid = v.Debug,
 			})
-			table.insert(TempTable,TempZone)
+			table.insert(TempTable, TempZone)
 		end
+		local TempZone
 		if #TempTable > 1 then
-			TempZone = ComboZone:Create(TempTable, {name= k .. "_combo"})
-			
+			TempZone = ComboZone:Create(TempTable, { name = k .. "_combo" })
 			TempZone:onPlayerInOut(function(isPointInside, point, zone)
-			  EnteredZone(isPointInside,k)
+				EnteredZone(isPointInside, k)
 			end, CheckLoopTime)
 		else
+			TempZone = TempTable[1]
 			TempZone:onPointInOut(PolyZone.getPlayerPosition, function(isPointInside, point, zone)
-			  EnteredZone(isPointInside,k)
+				EnteredZone(isPointInside, k)
 			end, CheckLoopTime)
 		end
+		table.insert(AllCreatedZones, TempZone)
 	end
 end)
 
-
-local IsLoopStarted = false
-local IsPlayerCanAttackInSafeZone = nil
-local UnarmedHash = `WEAPON_UNARMED`
-local WhatIsLastLoop = ""
-
-function EnteredZone(isPointInside,Name)
-	local InZone,Name = InZone,Name
+function EnteredZone(isPointInside, Name)
 	if isPointInside and WhatIsLastLoop ~= Name then
 		Citizen.CreateThread(function()
 			WhatIsLastLoop = Name
@@ -70,21 +67,12 @@ function EnteredZone(isPointInside,Name)
 			while WhatIsLastLoop == Name do
 				if not WhiteListedJobs[job] or not WhiteListedJobs[job][Name] or not (WhiteListedJobs[job][Name] <= grade) then -- check player can attack in safezone or not
 					local player = PlayerPedId() -- PlayerPedId is optimizer than GetPlayerPed
-					SetCurrentPedWeapon(player, UnarmedHash,true) -- Cant carry weapon
-					DisablePlayerFiring(player,true)  -- Disables firing all together
+					SetCurrentPedWeapon(player, UnarmedHash, true) -- Cant carry weapon
+					DisablePlayerFiring(player, true)  -- Disables firing all together
 					DisableControlAction(0, 140, true) -- R
 					DisableControlAction(0, 25, true) -- RIGHT MOUSE BUTTON Aim
-					if IsDisabledControlJustPressed(2, 37) then
-					TriggerEvent('ox_inventory:disarm')
-					end
-					if IsDisabledControlJustPressed(0, 24) then
-					TriggerEvent('ox_inventory:disarm')
-					end
-					if IsDisabledControlJustPressed(0, 25) then
-					TriggerEvent('ox_inventory:disarm')
-					end
-					if IsDisabledControlJustPressed(0, 37) then
-					TriggerEvent('ox_inventory:disarm')
+					if IsDisabledControlJustPressed(2, 37) or IsDisabledControlJustPressed(0, 24) or IsDisabledControlJustPressed(0, 25) or IsDisabledControlJustPressed(0, 37) then
+						TriggerEvent('ox_inventory:disarm')
 					end
 					IsPlayerCanAttackInSafeZone = false
 					Citizen.Wait(5)
@@ -113,24 +101,24 @@ end)
 
 -- Exports --
 InSafeZone = function()
-    return IsLoopStarted
+	return IsLoopStarted
 end
 
 exports("InSafeZone", InSafeZone)
 
 SafeZoneName = function()
-    return WhatIsLastLoop
+	return WhatIsLastLoop
 end
 
 exports("SafeZoneName", SafeZoneName)
 
 CanAttackInSafeZone = function()
-    return IsPlayerCanAttackInSafeZone
+	return IsPlayerCanAttackInSafeZone
 end
 
 exports("CanAttackInSafeZone", CanAttackInSafeZone)
 
-SetJobAndGrade = function(NewJob,NewGrade)
+SetJobAndGrade = function(NewJob, NewGrade)
 	job = NewJob
 	grade = NewGrade
 end
