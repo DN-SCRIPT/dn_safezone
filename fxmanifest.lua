@@ -8,7 +8,7 @@ description "An enhanced version of a SafeZone possible to have a zone with diff
 version '1.0.0'
 
 dependencies {
-    'PolyZone'
+    'PolyZone',
     'dn_notify'
 }
 
